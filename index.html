@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Papan Iklim Babel</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 20px;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #003366;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+select {
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.legend {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-auto-flow: column; /* 🔥 ini kuncinya */
+    gap: 10px 30px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.box {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Curah Hujan Harian (27 Mar - 28 Mar 2026)</h2>
+
+<div class="controls">
+<label>Kabupaten:</label>
+<select id="filterKab"></select>
+</div>
+
+<canvas id="chartCH"></canvas>
+
+<div class="legend">
+    <div class="legend-item"><div class="box" style="background:#cccccc"></div>Tidak ada hujan</div>
+    <div class="legend-item"><div class="box" style="background:#00ff00"></div>Ringan (0.5–20 mm)</div>
+    <div class="legend-item"><div class="box" style="background:#ffff00"></div>Sedang (21–50 mm)</div>
+    <div class="legend-item"><div class="box" style="background:#ffa500"></div>Lebat (51–100 mm)</div>
+    <div class="legend-item"><div class="box" style="background:#ff0000"></div>Sangat Lebat (101–150 mm)</div>
+    <div class="legend-item"><div class="box" style="background:#ff00ff"></div>Ekstrem (>150 mm)</div>
+</div>
+
+</div>
+
+<script>
+const dataGlobal = [{"LOKASI": "Sungai Liat", "LAT": -1.88556, "LON": 106.10222, "CH": 0.0, "nama_norm": "sungai liat", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Bintet", "LAT": -1.5573, "LON": 105.8488, "CH": 0.0, "nama_norm": "bintet", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Batu Rusa", "LAT": -2.026, "LON": 106.112, "CH": 0.0, "nama_norm": "batu rusa", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Kace", "LAT": -2.13583, "LON": 106.08778, "CH": 0.0, "nama_norm": "kace", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Rukam", "LAT": -2.2094, "LON": 105.9568, "CH": 0.0, "nama_norm": "rukam", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Paya Benua", "LAT": -2.09831, "LON": 105.9095, "CH": 0.0, "nama_norm": "paya benua", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Pemali", "LAT": -1.89861, "LON": 106.05667, "CH": 0.0, "nama_norm": "pemali", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Bakam", "LAT": -1.97278, "LON": 105.87222, "CH": 0.0, "nama_norm": "bakam", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Mapur", "LAT": -1.681, "LON": 105.983, "CH": 0.0, "nama_norm": "mapur", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Pugul", "LAT": -1.74528, "LON": 105.94722, "CH": 0.0, "nama_norm": "pugul", "kabupaten": "Bangka", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Pangkalalang", "LAT": -2.76025, "LON": 107.66108, "CH": 0.0, "nama_norm": "pangkalalang", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Air Saga", "LAT": -2.71553, "LON": 107.64172, "CH": 0.0, "nama_norm": "air saga", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Perawas", "LAT": -2.77714, "LON": 107.68553, "CH": 0.0, "nama_norm": "perawas", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Perawas BPP", "LAT": -2.75694, "LON": 107.71903, "CH": 0.0, "nama_norm": "perawas", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Sijuk", "LAT": -2.56867, "LON": 107.77022, "CH": 0.0, "nama_norm": "sijuk", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Tanjung Binga", "LAT": -2.60213, "LON": 107.64452, "CH": 0.0, "nama_norm": "tanjung binga", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Bukit Indah", "LAT": -2.75228, "LON": 107.86458, "CH": 0.0, "nama_norm": "bukit indah", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Ibul", "LAT": -2.84175, "LON": 107.79606, "CH": 0.0, "nama_norm": "ibul", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Pegantungan", "LAT": -2.8945, "LON": 107.567, "CH": 0.0, "nama_norm": "pegantungan", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Sungai Samak", "LAT": -2.85431, "LON": 107.59858, "CH": 0.0, "nama_norm": "sungai samak", "kabupaten": "Belitung", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Serdang", "LAT": -2.834, "LON": 106.423, "CH": 0.0, "nama_norm": "serdang", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Air Gegas", "LAT": -2.68417, "LON": 106.38833, "CH": 0.0, "nama_norm": "air gegas", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Tepus", "LAT": -3.016, "LON": 106.739, "CH": 0.0, "nama_norm": "tepus", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Nyelanding", "LAT": -2.70576, "LON": 106.2741, "CH": 0.0, "nama_norm": "nyelanding", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Air Bara", "LAT": -2.56025, "LON": 106.3637, "CH": 0.0, "nama_norm": "air bara", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Bangka Kota", "LAT": -2.51655, "LON": 106.0187, "CH": 0.0, "nama_norm": "bangka kota", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Sebagin", "LAT": -2.61881, "LON": 105.9018, "CH": 0.0, "nama_norm": "sebagin", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Jelutung II", "LAT": -2.6347, "LON": 106.0193, "CH": 0.0, "nama_norm": "jelutung ii", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Payung", "LAT": -2.60361, "LON": 106.14028, "CH": 0.0, "nama_norm": "payung", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Bukit Terap", "LAT": -2.98155, "LON": 106.5841, "CH": 0.0, "nama_norm": "bukit terap", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Sadai", "LAT": -3.0163, "LON": 106.7391, "CH": 0.0, "nama_norm": "sadai", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Batu Betumpang", "LAT": -2.8125, "LON": 106.13389, "CH": 0.0, "nama_norm": "batu betumpang", "kabupaten": "Bangka Selatan", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Penyak (Koba2)", "LAT": -2.40944, "LON": 106.29, "CH": 0.0, "nama_norm": "penyak", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Staklim Koba", "LAT": -2.523, "LON": 106.417, "CH": 0.2, "nama_norm": "koba", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Mangkol", "LAT": -2.15667, "LON": 106.08917, "CH": 0.0, "nama_norm": "mangkol", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Sungai Selan", "LAT": -2.36861, "LON": 105.99944, "CH": 0.0, "nama_norm": "sungai selan", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Kemingking", "LAT": -2.458, "LON": 106.132, "CH": 0.0, "nama_norm": "kemingking", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Tanjung Pura (Sungai Selan)", "LAT": -2.36958, "LON": 105.8166, "CH": 0.0, "nama_norm": "tanjung pura", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Celuak", "LAT": -2.32667, "LON": 106.14361, "CH": 0.0, "nama_norm": "celuak", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Cambai", "LAT": -2.24083, "LON": 106.15389, "CH": 0.0, "nama_norm": "cambai", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Lubuk Besar", "LAT": -2.54361, "LON": 106.66833, "CH": 0.0, "nama_norm": "lubuk besar", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Trubus", "LAT": -2.54833, "LON": 106.4982, "CH": 0.0, "nama_norm": "trubus", "kabupaten": "Bangka Tengah", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Muntok", "LAT": -2.06472, "LON": 105.16639, "CH": 0.0, "nama_norm": "mentok", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Mayang", "LAT": -1.97111, "LON": 105.29139, "CH": 0.0, "nama_norm": "mayang", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Simpang Tritip", "LAT": -1.92053, "LON": 105.38, "CH": 0.0, "nama_norm": "simpang teritip", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Kundi", "LAT": -2.11694, "LON": 105.39639, "CH": 0.0, "nama_norm": "kundi", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Simpang Tiga", "LAT": -1.99886, "LON": 105.3815, "CH": 0.0, "nama_norm": "simpang tiga", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Kelapa", "LAT": -1.8814, "LON": 105.68, "CH": 0.0, "nama_norm": "kelapa", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Dendang Bangka Barat", "LAT": -1.86389, "LON": 105.57722, "CH": 0.0, "nama_norm": "dendang bangka barat", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Desa Penyampak", "LAT": -1.99353, "LON": 105.6451, "CH": 0.0, "nama_norm": "penyampak", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Tempilang", "LAT": -2.07278, "LON": 105.66778, "CH": 0.0, "nama_norm": "tempilang", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Telak", "LAT": -1.677, "LON": 105.568, "CH": 0.0, "nama_norm": "telak", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Parit Tiga", "LAT": -1.645, "LON": 105.507, "CH": 0.0, "nama_norm": "parit tiga", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Dendang Beltim", "LAT": -3.06683, "LON": 107.90169, "CH": 0.0, "nama_norm": "dendang beltim", "kabupaten": "Belitung Timur", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Air Asam", "LAT": -2.95, "LON": 107.856, "CH": 0.0, "nama_norm": "air asam", "kabupaten": "Belitung Timur", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Kelapa kampit", "LAT": -2.68894, "LON": 108.0585, "CH": 0.0, "nama_norm": "kelapa kampit", "kabupaten": "Bangka Barat", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Damar", "LAT": -2.78108, "LON": 108.21411, "CH": 0.0, "nama_norm": "damar", "kabupaten": "Belitung Timur", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Simpang Renggiang", "LAT": -2.87306, "LON": 108.18839, "CH": 0.0, "nama_norm": "simpang renggiang", "kabupaten": "Belitung Timur", "periode": "27 Mar - 28 Mar 2026"}, {"LOKASI": "Simpang Pesak", "LAT": -3.11139, "LON": 107.96639, "CH": 0.0, "nama_norm": "simpang pesak", "kabupaten": "Belitung Timur", "periode": "27 Mar - 28 Mar 2026"}];
+
+// kategori + warna
+function getKategori(val) {
+    if (val == 0) return ["Tidak ada hujan", "#cccccc"];
+    if (val <= 20) return ["Ringan", "#00ff00"];
+    if (val <= 50) return ["Sedang", "#ffff00"];
+    if (val <= 100) return ["Lebat", "#ffa500"];
+    if (val <= 150) return ["Sangat Lebat", "#ff0000"];
+    return ["Ekstrem", "#ff00ff"];
+}
+
+const kabList = [...new Set(dataGlobal.map(d => d.kabupaten).filter(Boolean))];
+
+const select = document.getElementById("filterKab");
+
+kabList.forEach(kab => {
+    let opt = document.createElement("option");
+    opt.value = kab;
+    opt.innerText = kab;
+    select.appendChild(opt);
+});
+
+let chart;
+
+function renderChart(kabupaten) {
+    let filtered = dataGlobal.filter(d => d.kabupaten === kabupaten);
+
+    filtered.sort((a,b) => b.CH - a.CH);
+
+    const labels = filtered.map(d => d.LOKASI);
+    const values = filtered.map(d => d.CH);
+    const colors = values.map(v => getKategori(v)[1]);
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(document.getElementById("chartCH"), {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Curah Hujan (mm)",
+                data: values,
+                backgroundColor: colors
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let val = context.raw;
+                            let kategori = getKategori(val)[0];
+                            return context.label + ": " + val + " mm (" + kategori + ")";
+                        }
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Curah Hujan (mm)"
+                    }
+                }
+            }
+        }
+    });
+}
+
+renderChart(kabList[0]);
+
+select.addEventListener("change", function() {
+    renderChart(this.value);
+});
+</script>
+
+</body>
+</html>
