@@ -38,7 +38,7 @@ select {
     margin-top: 20px;
     display: grid;
     grid-template-columns: repeat(2, auto);
-    grid-auto-flow: column; /* 🔥 ini kuncinya */
+    grid-auto-flow: column;
     gap: 10px 30px;
 }
 
@@ -51,6 +51,12 @@ select {
     width: 20px;
     height: 20px;
     margin-right: 8px;
+}
+
+#infoText {
+    text-align: center;
+    color: #666;
+    margin-top: 10px;
 }
 </style>
 </head>
@@ -68,6 +74,8 @@ Pengukuran 27 Maret 2026 07:00 WIB s.d 28 Maret 2026 07:00 WIB
 <label>Kabupaten:</label>
 <select id="filterKab"></select>
 </div>
+
+<p id="infoText">Silakan pilih kabupaten untuk melihat grafik</p>
 
 <canvas id="chartCH"></canvas>
 
@@ -99,7 +107,7 @@ const kabList = [...new Set(dataGlobal.map(d => d.kabupaten).filter(Boolean))];
 
 const select = document.getElementById("filterKab");
 
-// option default
+// default option
 let defaultOpt = document.createElement("option");
 defaultOpt.value = "";
 defaultOpt.innerText = "Pilih Kabupaten";
@@ -107,7 +115,7 @@ defaultOpt.selected = true;
 defaultOpt.disabled = true;
 select.appendChild(defaultOpt);
 
-// isi kabupaten
+// isi dropdown
 kabList.forEach(kab => {
     let opt = document.createElement("option");
     opt.value = kab;
@@ -115,7 +123,20 @@ kabList.forEach(kab => {
     select.appendChild(opt);
 });
 
-let chart;
+// inisialisasi chart kosong
+let chart = new Chart(document.getElementById("chartCH"), {
+    type: "bar",
+    data: {
+        labels: [],
+        datasets: [{
+            label: "Curah Hujan (mm)",
+            data: []
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
 
 function renderChart(kabupaten) {
 
@@ -129,7 +150,7 @@ function renderChart(kabupaten) {
     const values = filtered.map(d => d.CH);
     const colors = values.map(v => getKategori(v)[1]);
 
-    if (chart) chart.destroy();
+    chart.destroy();
 
     chart = new Chart(document.getElementById("chartCH"), {
         type: "bar",
@@ -170,14 +191,11 @@ function renderChart(kabupaten) {
     });
 }
 
+// event dropdown (FIX: hanya 1 event)
 select.addEventListener("change", function() {
-    if (this.value) {
+    if (this.value !== "") {
         renderChart(this.value);
     }
-});
-
-select.addEventListener("change", function() {
-    renderChart(this.value);
 });
 </script>
 
