@@ -87,7 +87,7 @@ const dataGlobal = [{"LOKASI": "Sungai Liat", "LAT": -1.88556, "LON": 106.10222,
 
 // kategori + warna
 function getKategori(val) {
-    if (val == 0) return ["Tidak ada hujan", "#cccccc"];
+    if (val < 0.5) return ["Tidak ada hujan", "#cccccc"];
     if (val <= 20) return ["Ringan", "#00ff00"];
     if (val <= 50) return ["Sedang", "#ffff00"];
     if (val <= 100) return ["Lebat", "#ffa500"];
