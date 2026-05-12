@@ -103,7 +103,20 @@ function getKategori(val) {
     return ["Ekstrem", "#ff00ff"];
 }
 
-const kabList = [...new Set(dataGlobal.map(d => d.kabupaten).filter(Boolean))];
+// urutan kabupaten sesuai keinginan
+const urutanKab = [
+    "Bangka Barat",
+    "Bangka",
+    "Bangka Tengah",
+    "Bangka Selatan",
+    "Belitung",
+    "Belitung Timur"
+];
+
+// ambil kabupaten unik lalu urutkan
+const kabList = urutanKab.filter(kab =>
+    dataGlobal.some(d => d.kabupaten === kab)
+);
 
 const select = document.getElementById("filterKab");
 
